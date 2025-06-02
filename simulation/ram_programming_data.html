@@ -1,0 +1,278 @@
+<!-- ram_programming_data.html -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Programación de la Memoria RAM 1024×8</title>
+    <style>
+        /* -------------------------------------------------------------------------
+           Estilos copiados de "Guía de Conexiones para CircuitJS"
+           ------------------------------------------------------------------------- */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2196F3;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #1976D2;
+            border-bottom: 2px solid #E3F2FD;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+
+        h3 {
+            color: #0D47A1;
+            margin-top: 20px;
+        }
+
+        .info-box {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #0c5460;
+        }
+
+        .formula {
+            color: #c586c0;
+            font-style: italic;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            gap: 2px;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+
+        .data-cell {
+            padding: 4px;
+            text-align: center;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+
+        .address-label {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            font-weight: bold;
+        }
+
+        .hex-value {
+            color: #333;
+        }
+
+        button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        .hex-dump {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
+        /* -------------------------------------------------------------------------
+           Fin de estilos
+           ------------------------------------------------------------------------- */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📊 Programación de la Memoria RAM 1024×8</h1>
+        <h2>Generador DDS de Formas de Onda</h2>
+
+        <div class="info-box">
+            <ul>
+                <li><strong>Formato de Datos:</strong></li>
+                <ul>
+                    <li>Total: 1024 bytes (0x000 – 0x3FF)</li>
+                    <li>4 formas de onda × 256 muestras cada una</li>
+                    <li>Resolución: 8 bits por muestra (0x00 – 0xFF)</li>
+                    <li>Direccionamiento: A9:A8 selecciona forma, A7:A0 selecciona muestra</li>
+                </ul>
+            </ul>
+        </div>
+
+        <!-- Onda Senoidal -->
+        <div class="waveform-section">
+            <h3>🌊 ONDA SENOIDAL (0x000 – 0x0FF)</h3>
+            <p class="formula">Fórmula: valor = 128 + 127 × sin(2π × n/256)</p>
+            <div class="data-grid" id="sine-grid"></div>
+            <button onclick="toggleHexDump('sine-dump')">Ver Dump Hexadecimal</button>
+            <div id="sine-dump" class="hex-dump"></div>
+        </div>
+
+        <!-- Onda Cuadrada -->
+        <div class="waveform-section">
+            <h3>⬛ ONDA CUADRADA (0x100 – 0x1FF)</h3>
+            <p class="formula">Fórmula: valor = 255 (primeras 128), 0 (últimas 128)</p>
+            <div class="data-grid" id="square-grid"></div>
+            <button onclick="toggleHexDump('square-dump')">Ver Dump Hexadecimal</button>
+            <div id="square-dump" class="hex-dump"></div>
+        </div>
+
+        <!-- Onda Sierra -->
+        <div class="waveform-section">
+            <h3>📐 DIENTE DE SIERRA (0x200 – 0x2FF)</h3>
+            <p class="formula">Fórmula: valor = n (rampa ascendente lineal)</p>
+            <div class="data-grid" id="sawtooth-grid"></div>
+            <button onclick="toggleHexDump('sawtooth-dump')">Ver Dump Hexadecimal</button>
+            <div id="sawtooth-dump" class="hex-dump"></div>
+        </div>
+
+        <!-- Onda Triangular -->
+        <div class="waveform-section">
+            <h3>🔺 ONDA TRIANGULAR (0x300 – 0x3FF)</h3>
+            <p class="formula">Fórmula: valor = 2×n (0–127), 510 – 2×n (128–255)</p>
+            <div class="data-grid" id="triangle-grid"></div>
+            <button onclick="toggleHexDump('triangle-dump')">Ver Dump Hexadecimal</button>
+            <div id="triangle-dump" class="hex-dump"></div>
+        </div>
+    </div>
+
+    <script>
+        // Generar datos de las formas de onda
+        function generateSineData() {
+            const data = [];
+            for (let i = 0; i < 256; i++) {
+                const value = Math.round(128 + 127 * Math.sin(2 * Math.PI * i / 256));
+                data.push(Math.max(0, Math.min(255, value)));
+            }
+            return data;
+        }
+        function generateSquareData() {
+            const data = [];
+            for (let i = 0; i < 128; i++) data.push(255);
+            for (let i = 0; i < 128; i++) data.push(0);
+            return data;
+        }
+        function generateSawtoothData() {
+            const data = [];
+            for (let i = 0; i < 256; i++) data.push(i);
+            return data;
+        }
+        function generateTriangleData() {
+            const data = [];
+            for (let i = 0; i < 128; i++) data.push(i * 2);
+            for (let i = 128; i < 256; i++) data.push(510 - i * 2);
+            return data;
+        }
+
+        // Mostrar datos en la grilla
+        function displayData(elementId, data, baseAddress) {
+            const grid = document.getElementById(elementId);
+            grid.innerHTML = '';
+
+            // Fila de encabezado
+            const header = document.createElement('div');
+            header.className = 'data-cell address-label';
+            header.textContent = 'Dir+';
+            grid.appendChild(header);
+
+            for (let i = 0; i < 16; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'data-cell address-label';
+                cell.textContent = '+' + i.toString(16).toUpperCase();
+                grid.appendChild(cell);
+            }
+
+            // Filas de datos
+            for (let row = 0; row < 16; row++) {
+                const addr = document.createElement('div');
+                addr.className = 'data-cell address-label';
+                addr.textContent = '0x' + (baseAddress + row * 16).toString(16).toUpperCase().padStart(3, '0');
+                grid.appendChild(addr);
+
+                for (let col = 0; col < 16; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'data-cell hex-value';
+                    const index = row * 16 + col;
+                    cell.textContent = data[index].toString(16).toUpperCase().padStart(2, '0');
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        // Generar dump hexadecimal
+        function generateHexDump(data, baseAddress) {
+            let dump = '';
+            for (let i = 0; i < data.length; i += 16) {
+                dump += '0x' + (baseAddress + i).toString(16).toUpperCase().padStart(3, '0') + ': ';
+                for (let j = 0; j < 16 && i + j < data.length; j++) {
+                    dump += data[i + j].toString(16).toUpperCase().padStart(2, '0') + ' ';
+                }
+                dump += '\n';
+            }
+            return dump;
+        }
+
+        // Alternar visibilidad del dump
+        function toggleHexDump(elementId) {
+            const element = document.getElementById(elementId);
+            element.classList.toggle('show');
+        }
+
+        // Inicializar la página
+        const sineData = generateSineData();
+        const squareData = generateSquareData();
+        const sawtoothData = generateSawtoothData();
+        const triangleData = generateTriangleData();
+
+        displayData('sine-grid', sineData, 0x000);
+        displayData('square-grid', squareData, 0x100);
+        displayData('sawtooth-grid', sawtoothData, 0x200);
+        displayData('triangle-grid', triangleData, 0x300);
+
+        document.getElementById('sine-dump').textContent = generateHexDump(sineData, 0x000);
+        document.getElementById('square-dump').textContent = generateHexDump(squareData, 0x100);
+        document.getElementById('sawtooth-dump').textContent = generateHexDump(sawtoothData, 0x200);
+        document.getElementById('triangle-dump').textContent = generateHexDump(triangleData, 0x300);
+    </script>
+</body>
+
+</html>

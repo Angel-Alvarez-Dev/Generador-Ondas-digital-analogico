@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Conexiones CircuitJS - Generador de Formas de Onda</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2196F3;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #1976D2;
+            border-bottom: 2px solid #E3F2FD;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+
+        h3 {
+            color: #0D47A1;
+            margin-top: 20px;
+        }
+
+        .component-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .connection-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .connection-table th,
+        .connection-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .connection-table th {
+            background-color: #2196F3;
+            color: white;
+            font-weight: bold;
+        }
+
+        .connection-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .connection-table tr:hover {
+            background-color: #e3f2fd;
+        }
+
+        .pin-label {
+            font-family: monospace;
+            background-color: #e8f5e9;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #1b5e20;
+            font-weight: bold;
+        }
+
+        .wire-label {
+            font-family: monospace;
+            background-color: #fff3e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e65100;
+        }
+
+        .component-label {
+            font-family: monospace;
+            background-color: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #0d47a1;
+            font-weight: bold;
+        }
+
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #856404;
+        }
+
+        .info-box {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #0c5460;
+        }
+
+        .success-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #155724;
+        }
+
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .diagram-box {
+            background-color: #f0f0f0;
+            border: 2px solid #333;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            text-align: center;
+        }
+
+        ul {
+            line-height: 1.8;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .value-label {
+            background-color: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔌 Guía de Conexiones para CircuitJS - Generador de Formas de Onda DDS</h1>
+
+        <div class="info-box">
+            <h3>📝 Información General del Circuito</h3>
+            <ul>
+                <li><strong>Resolución:</strong> 8 bits (256 niveles)</li>
+                <li><strong>Memoria:</strong> 1024×8 bits (4 formas de onda × 256 muestras)</li>
+                <li><strong>Frecuencia de salida:</strong> f_oscilador / 256</li>
+                <li><strong>Voltaje de salida:</strong> ±2.5V (bipolar)</li>
+                <li><strong>Formas de onda:</strong> Senoidal, Cuadrada, Sierra, Triangular</li>
+            </ul>
+        </div>
+
+        <h2>🔧 Componentes Necesarios en CircuitJS</h2>
+        <div class="component-section">
+            <table class="connection-table">
+                <tr>
+                    <th>Componente</th>
+                    <th>Tipo en CircuitJS</th>
+                    <th>Cantidad</th>
+                    <th>Configuración</th>
+                </tr>
+                <tr>
+                    <td>Timer 555</td>
+                    <td>555 Timer IC</td>
+                    <td>1</td>
+                    <td>Modo astable</td>
+                </tr>
+                <tr>
+                    <td>Contador 8-bit</td>
+                    <td>Counter (8-bit)</td>
+                    <td>1</td>
+                    <td>Cuenta ascendente</td>
+                </tr>
+                <tr>
+                    <td>Memoria RAM</td>
+                    <td>Static RAM</td>
+                    <td>1</td>
+                    <td>1024×8 bits</td>
+                </tr>
+                <tr>
+                    <td>DAC 8-bit</td>
+                    <td>DAC (8-bit)</td>
+                    <td>1</td>
+                    <td>Vref = 5V</td>
+                </tr>
+                <tr>
+                    <td>Op-Amp</td>
+                    <td>Op-Amp (ideal)</td>
+                    <td>1</td>
+                    <td>Ganancia = 1</td>
+                </tr>
+                <tr>
+                    <td>Switches</td>
+                    <td>SPST Switch</td>
+                    <td>2</td>
+                    <td>SW1 (MSB), SW0 (LSB)</td>
+                </tr>
+                <tr>
+                    <td>Potenciómetro</td>
+                    <td>Pot (slider)</td>
+                    <td>1</td>
+                    <td>10kΩ (frecuencia)</td>
+                </tr>
+            </table>
+        </div>
+
+        <h2>🔌 Conexiones Detalladas</h2>
+
+        <div class="component-section">
+            <h3><span class="step-number">1</span> Timer 555 (Oscilador)</h3>
+            <table class="connection-table">
+                <tr>
+                    <th>Pin 555</th>
+                    <th>Conectar a</th>
+                    <th>Componente/Valor</th>
+                    <th>Función</th>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Pin 1</span></td>
+                    <td><span class="wire-label">GND</span></td>
+                    <td>Tierra común</td>
+                    <td>Referencia</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Pin 2</span></td>
+                    <td><span class="pin-label">Pin 6</span></td>
+                    <td>Conexión directa</td>
+                    <td>Trigger = Threshold</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Pin 3</span></td>
+                    <td><span class="component-label">CLK del Contador</span></td>
+                    <td>Señal de reloj</td>
+                    <td>Salida del oscilador</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Pin 4</span></td>
+                    <td><span class="wire-label">+5V</span></td>
+                    <td>Alimentación</td>
+                    <td>Reset deshabilitado</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Pin 5</span></td>
+                    <td><span class="value-label">0.01µF</span> → GND</td>
+                    <td>Capacitor cerámico</td>
+                    <td>Filtro de ruido</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Pin 6</span></td>
+                    <td>Unión R1-R2-C1</td>
+                    <td>Red RC</td>
+                    <td>Threshold</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Pin 7</span></td>
+                    <td>Entre R1 y R2</td>
+                    <td>Descarga</td>
+                    <td>Discharge</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Pin 8</span></td>
+                    <td><span class="wire-label">+5V</span></td>
+                    <td>Alimentación</td>
+                    <td>VCC</td>
+                </tr>
+            </table>
+            <div class="info-box">
+                <strong>Componentes RC:</strong>
+                <ul>
+                    <li>R1 = <span class="value-label">100kΩ</span> (Pin 8 → Pin 7)</li>
+                    <li>R2 = <span class="value-label">10kΩ pot</span> (Pin 7 → Pin 6)</li>
+                    <li>C1 = <span class="value-label">1µF</span> (Pin 6 → GND)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="component-section">
+            <h3><span class="step-number">2</span> Contador 8-bit</h3>
+            <table class="connection-table">
+                <tr>
+                    <th>Pin Contador</th>
+                    <th>Conectar a</th>
+                    <th>Función</th>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">CLK</span></td>
+                    <td><span class="component-label">555 Pin 3</span></td>
+                    <td>Entrada de reloj</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">RESET</span></td>
+                    <td><span class="wire-label">GND</span></td>
+                    <td>Conteo libre</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Q0</span></td>
+                    <td><span class="component-label">RAM A0</span></td>
+                    <td>Bit 0 dirección</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Q1</span></td>
+                    <td><span class="component-label">RAM A1</span></td>
+                    <td>Bit 1 dirección</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Q2</span></td>
+                    <td><span class="component-label">RAM A2</span></td>
+                    <td>Bit 2 dirección</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Q3</span></td>
+                    <td><span class="component-label">RAM A3</span></td>
+                    <td>Bit 3 dirección</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Q4</span></td>
+                    <td><span class="component-label">RAM A4</span></td>
+                    <td>Bit 4 dirección</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Q5</span></td>
+                    <td><span class="component-label">RAM A5</span></td>
+                    <td>Bit 5 dirección</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Q6</span></td>
+                    <td><span class="component-label">RAM A6</span></td>
+                    <td>Bit 6 dirección</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">Q7</span></td>
+                    <td><span class="component-label">RAM A7</span></td>
+                    <td>Bit 7 dirección</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="component-section">
+            <h3><span class="step-number">3</span> Memoria Static RAM 1024×8</h3>
+            <table class="connection-table">
+                <tr>
+                    <th>Pin RAM</th>
+                    <th>Conectar a</th>
+                    <th>Función</th>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">WE</span></td>
+                    <td><span class="wire-label">+5V</span></td>
+                    <td>Escritura deshabilitada (ROM)</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">OE</span></td>
+                    <td><span class="wire-label">GND</span></td>
+                    <td>Salida habilitada</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">A0-A7</span></td>
+                    <td><span class="component-label">Contador Q0-Q7</span></td>
+                    <td>Direcciones bajas</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">A8</span></td>
+                    <td><span class="component-label">SW0 (LSB)</span></td>
+                    <td>Selector forma bit 0</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">A9</span></td>
+                    <td><span class="component-label">SW1 (MSB)</span></td>
+                    <td>Selector forma bit 1</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">D0-D7</span></td>
+                    <td><span class="component-label">DAC D0-D7</span></td>
+                    <td>Datos de salida</td>
+                </tr>
+            </table>
+            <div class="warning-box">
+                <strong>⚠️ Importante:</strong> Agregar resistencias pull-down de <span class="value-label">20kΩ</span>
+                en cada línea D0-D7 para evitar estados flotantes.
+            </div>
+        </div>
+
+        <div class="component-section">
+            <h3><span class="step-number">4</span> DAC 8-bit</h3>
+            <table class="connection-table">
+                <tr>
+                    <th>Pin DAC</th>
+                    <th>Conectar a</th>
+                    <th>Función</th>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">D0-D7</span></td>
+                    <td><span class="component-label">RAM D0-D7</span></td>
+                    <td>Entrada digital</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">VREF</span></td>
+                    <td><span class="wire-label">+5V</span></td>
+                    <td>Referencia de voltaje</td>
+                </tr>
+                <tr>
+                    <td><span class="pin-label">VOUT</span></td>
+                    <td>R1 del divisor</td>
+                    <td>Salida analógica 0-5V</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="component-section">
+            <h3><span class="step-number">5</span> Etapa de Offset y Amplificador</h3>
+            <table class="connection-table">
+                <tr>
+                    <th>Componente</th>
+                    <th>Conexión</th>
+                    <th>Valor</th>
+                    <th>Función</th>
+                </tr>
+                <tr>
+                    <td>R1a</td>
+                    <td>DAC VOUT → OpAmp(+)</td>
+                    <td><span class="value-label">10kΩ</span></td>
+                    <td>Divisor entrada</td>
+                </tr>
+                <tr>
+                    <td>R1b</td>
+                    <td>Vref 2.5V → OpAmp(−)</td>
+                    <td><span class="value-label">10kΩ</span></td>
+                    <td>Offset -2.5V</td>
+                </tr>
+                <tr>
+                    <td>R2</td>
+                    <td>OpAmp OUT → OpAmp(−)</td>
+                    <td><span class="value-label">10kΩ</span></td>
+                    <td>Retroalimentación</td>
+                </tr>
+                <tr>
+                    <td>R2'</td>
+                    <td>OpAmp(+) → GND</td>
+                    <td><span class="value-label">10kΩ</span></td>
+                    <td>Balance de impedancia</td>
+                </tr>
+                <tr>
+                    <td>OpAmp V+</td>
+                    <td>Fuente positiva</td>
+                    <td><span class="wire-label">+5V</span></td>
+                    <td>Alimentación</td>
+                </tr>
+                <tr>
+                    <td>OpAmp V−</td>
+                    <td>Fuente negativa</td>
+                    <td><span class="wire-label">−5V</span></td>
+                    <td>Alimentación</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="component-section">
+            <h3><span class="step-number">6</span> Filtro RC (2° orden)</h3>
+            <table class="connection-table">
+                <tr>
+                    <th>Componente</th>
+                    <th>Conexión</th>
+                    <th>Valor</th>
+                </tr>
+                <tr>
+                    <td>Rf1</td>
+                    <td>OpAmp OUT → Nodo1</td>
+                    <td><span class="value-label">3.3kΩ</span></td>
+                </tr>
+                <tr>
+                    <td>C1</td>
+                    <td>Nodo1 → GND</td>
+                    <td><span class="value-label">10nF</span></td>
+                </tr>
+                <tr>
+                    <td>Rf2</td>
+                    <td>Nodo1 → Salida</td>
+                    <td><span class="value-label">3.3kΩ</span></td>
+                </tr>
+                <tr>
+                    <td>C2</td>
+                    <td>Salida → GND</td>
+                    <td><span class="value-label">10nF</span></td>
+                </tr>
+            </table>
+            <div class="info-box">
+                <strong>Frecuencia de corte:</strong> fc ≈ 4.8 kHz
+            </div>
+        </div>
+
+        <h2>🎯 Selección de Formas de Onda</h2>
+        <div class="component-section">
+            <table class="connection-table">
+                <tr>
+                    <th>SW1 (MSB)</th>
+                    <th>SW0 (LSB)</th>
+                    <th>Dirección</th>
+                    <th>Forma de Onda</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0-255</td>
+                    <td>🌊 Senoidal</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>256-511</td>
+                    <td>⬛ Cuadrada</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>512-767</td>
+                    <td>📐 Sierra</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>768-1023</td>
+                    <td>🔺 Triangular</td>
+                </tr>
+            </table>
+        </div>
+
+        <h2>📊 Diagrama de Conexiones</h2>
+        <div class="diagram-box">
+            <pre>
+    +5V ─────┬─────────┬─────────┬─────────┬─────────┐
+             │         │         │         │         │
+         ┌───┴───┐ ┌───┴───┐ ┌───┴───┐ ┌───┴───┐ ┌───┴───┐
+         │  555  │ │Counter│ │  RAM  │ │  DAC  │ │Op-Amp │
+         │Timer  │ │ 8-bit │ │1024×8 │ │ 8-bit │ │Offset │
+         └───┬───┘ └───┬───┘ └───┬───┘ └───┬───┘ └───┬───┘
+             │         │         │         │         │
+         CLK ├─────────┤ Q0-Q7 ──┤ D0-D7 ──┤ VOUT ───┤
+             │         │         │         │         │
+             │         │      A8 ├─────────┤ SW0     │
+             │         │      A9 ├─────────┤ SW1     │
+             │         │         │         │         │
+         GND ├─────────┴─────────┴─────────┴─────────┴─── GND
+            </pre>
+        </div>
+
+        <h2>✅ Checklist de Verificación</h2>
+        <div class="success-box">
+            <h3>Antes de simular:</h3>
+            <ul>
+                <li>☐ Todas las alimentaciones conectadas (+5V y GND)</li>
+                <li>☐ Pin WE de RAM conectado a +5V (modo lectura)</li>
+                <li>☐ Pin OE de RAM conectado a GND (salida activa)</li>
+                <li>☐ Resistencias pull-down en D0-D7</li>
+                <li>☐ Capacitor de 0.01µF en pin 5 del 555</li>
+                <li>☐ Switches SW0 y SW1 en posición inicial</li>
+                <li>☐ Datos cargados en la RAM (archivo .hex)</li>
+                <li>☐ Fuente simétrica ±5V para el OpAmp</li>
+            </ul>
+        </div>
+
+        <h2>🛠️ Solución de Problemas</h2>
+        <div class="warning-box">
+            <h3>Problemas comunes:</h3>
+            <ul>
+                <li><strong>No hay salida:</strong> Verificar que OE=GND y WE=+5V en la RAM</li>
+                <li><strong>Forma incorrecta:</strong> Revisar conexiones SW0/SW1 a A8/A9</li>
+                <li><strong>Frecuencia incorrecta:</strong> Ajustar R2 (pot) del 555</li>
+                <li><strong>Salida con ruido:</strong> Verificar capacitor en pin 5 del 555</li>
+                <li><strong>Offset incorrecto:</strong> Revisar alimentación simétrica del OpAmp</li>
+            </ul>
+        </div>
+
+        <h2>📝 Notas Finales</h2>
+        <div class="info-box">
+            <ul>
+                <li>La frecuencia de salida es: <strong>f_out = f_555 / 256</strong></li>
+                <li>Para f_555 = 1 kHz, f_out = 3.9 Hz</li>
+                <li>El filtro RC atenúa armónicos por encima de 4.8 kHz</li>
+                <li>La salida es bipolar: ±2.5V centrada en 0V</li>
+                <li>Cada forma de onda usa 256 muestras de 8 bits</li>
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>
