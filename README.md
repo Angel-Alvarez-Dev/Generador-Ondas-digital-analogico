@@ -112,16 +112,8 @@ Sistema-Digital-Analogico-Generador/
 4. Pegar y hacer clic en **OK**
 5. Presionar **Run** para iniciar la simulación
 
-### 2. Simulación Local
 
-1. Abrir el archivo `simulation/Generator.html` en un navegador moderno
-2. El circuito se cargará automáticamente
-3. Usar los controles interactivos para:
-   - Ajustar frecuencia (potenciómetro)
-   - Cambiar forma de onda (switches SW0, SW1)
-   - Modificar amplitud (control de ganancia)
-
-### 3. Selección de Formas de Onda
+### 2. Selección de Formas de Onda
 
 | SW1 | SW0 | Dirección RAM | Forma de Onda |
 |-----|-----|---------------|---------------|
@@ -151,7 +143,7 @@ Rise time < 1µs
 </tr>
 <tr>
 <td align="center">
-<img src="assets/Señal_diente_de_sierra.png" width="200"><br>
+<img src="assets/Señal_diente_sierra.png" width="200"><br>
 <b>Diente de Sierra</b><br>
 Linealidad > 99%
 </td>
