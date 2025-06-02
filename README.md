@@ -1,6 +1,5 @@
 # Sistema Digital-Analógico Generador de Formas de Onda 🌊
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CircuitJS](https://img.shields.io/badge/Simulator-CircuitJS-blue.svg)](https://www.falstad.com/circuit/circuitjs.html)
 [![Status](https://img.shields.io/badge/Status-Completed-success.svg)]()
 
@@ -77,7 +76,7 @@ El generador implementa la técnica DDS (Direct Digital Synthesis) utilizando:
 Sistema-Digital-Analogico-Generador/
 │
 ├── 📄 README.md                    # Este archivo
-├── 📄 .gitignore                   # Archivos ignorados por Git
+├── 📄 actividad final.pdf          # Descripción de la actividad
 │
 ├── 📂 assets/                      # Recursos visuales
 │   ├── 📸 Señal_senoidal.png       # Captura osciloscopio - Senoidal
@@ -96,7 +95,7 @@ Sistema-Digital-Analogico-Generador/
 │   ├── 📄 Contenido_RAM_Estática.txt       # Datos hexadecimales RAM
 │   └── 📄 Diagrama_electronico.pdf         # Esquemático y resultados
 │
-└── 📂 src/                         # Código fuente (opcional)
+└── 📂 src/                        
     ├── 📄 waveform_generator.py    # Script generador de tablas
     └── 📄 frequency_calculator.py  # Calculadora de frecuencias
 ```
